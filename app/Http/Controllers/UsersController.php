@@ -14,7 +14,6 @@ class UsersController extends Controller
         // ユーザ一覧をidの降順で取得
         $users = User::orderBy('id', 'desc')->paginate(10);
 
-// dd($users);
         // ユーザ一覧ビューでそれを表示
         return view('users.index',[
             'users' => $users,
@@ -25,7 +24,7 @@ class UsersController extends Controller
     {
         // idの値でユーザを検索して取得
         $user = User::findOrFail($id);
-        
+       
         // 関係するモデルの件数をロード
         $user->loadRelationshipCounts();
         
@@ -84,6 +83,30 @@ class UsersController extends Controller
         return view('users.followers', [
             'user' => $user,
             'users' => $followers,
+        ]);
+    }
+    
+    /**
+     * ユーザのお気に入り投稿一覧ページを表示するアクション。
+     *
+     * @param  $id  ユーザのid
+     * @return \Illuminate\Http\Response
+     */
+    public function favorites($id)
+    {
+        // idの値でユーザを検索して取得
+        $user = User::findOrFail($id);
+
+        // 関係するモデルの件数をロード
+        $user->loadRelationshipCounts();
+
+        // ユーザのお気に入り投稿一覧を取得
+        $microposts = $user->favorites()->paginate(10);
+        
+        // お気に入り投稿一覧ビューでそれらを表示
+        return view('users.favorites', [
+            'user' => $user,
+            'microposts' => $microposts,
         ]);
     }
 }
